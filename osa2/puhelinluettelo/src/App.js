@@ -1,11 +1,25 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+import personService from './services/persons'
+
 const Header = () => {
   return <h2>Phonebook</h2>
 }
+
 const Persons = (props) => {
   return (
-    <p>{props.person.name} {props.person.number}</p>
+    <p>
+      {props.person.name} {props.person.number}
+      <Remove person={props.person} onClick={props.removeName} />
+    </p>
+
+  )
+}
+
+const Remove = ({ person, onClick }) => {
+  return (
+    <>
+      <button onClick={() => onClick(person)}>Poista</button>
+    </>
   )
 }
 
@@ -38,20 +52,20 @@ const Add = (props) => {
 const Filter = (props) => {
   return (
     <>
-        filter shown with <input
-          value={props.finder}
-          onChange={props.handleChange}
-        />
+      filter shown with <input
+        value={props.finder}
+        onChange={props.handleChange}
+      />
     </>
   )
 }
-const Numbers = (props) => {
+const Numbers = ({ persons, finder, removeName }) => {
   return (
     <>
       <h2>Numbers</h2>
       <div>
-        {props.persons.filter(person => person.name.toLowerCase().includes(props.finder.toLowerCase())).map((person, i) =>
-          <Persons key={i} person={person} />
+        {persons.filter(person => person.name.toLowerCase().includes(finder.toLowerCase())).map((person, i) =>
+          <Persons key={i} person={person} removeName={removeName} />
         )}
       </div>
     </>
@@ -66,15 +80,12 @@ const App = () => {
   const [finder, setNewFinder] = useState('')
 
   useEffect(() => {
-    console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
+    personService
+      .getAll()
       .then(response => {
-        console.log('promise fulfilled')
-        setPersons(response.data)
+        setPersons(response)
       })
   }, [])
-  console.log('render', persons.length,'persons')
 
 
   const handleChange = (event) => {
@@ -94,14 +105,30 @@ const App = () => {
       name: newName,
       number: newNumber
     }
+    
     if (persons.map(x => x.name).includes(newName)) {
-      window.alert(`${newName} is alredy added to phonebook`)
+      if(window.confirm(`${newName} is alredy added to phonebook, replace older number with new one?`)) {
+        const nameObject = {
+          name: newName,
+          number: newNumber
+        }
+        const person = persons.find(x => x.name === newName)
+        personService
+          .update(person.id, nameObject)
+          .then(response => {
+            setPersons(persons.map(personel => person.id !== personel.id ? personel : response))
+          })
+      }
       setNewName('')
       setNewNumber('')
     } else if (newName !== '') {
-      setPersons(persons.concat(nameObject))
-      setNewName('')
-      setNewNumber('')
+      personService
+        .create(nameObject)
+        .then(response => {
+          setPersons(persons.concat(response))
+          setNewName('')
+          setNewNumber('')
+        })
     } else {
       window.alert(`Default input is not allowed.`)
       setNewName('')
@@ -109,10 +136,18 @@ const App = () => {
     }
   }
 
+  const removeName = (person) => {
+    if (window.confirm(`Do you want to remove ${person.name}`)) {
+      personService.remove(person.id)
+      var a = persons
+      setPersons(a.filter(x => x.id !== person.id))
+    }
+  }
+
   return (
     <div>
       <Header />
-      <Filter 
+      <Filter
         finder={finder}
         handleChange={handleChange}
       />
@@ -123,9 +158,10 @@ const App = () => {
         handleNumberChange={handleNumberChange}
         addName={addName}
       />
-      <Numbers 
-        persons= {persons}
-        finder= {finder}
+      <Numbers
+        persons={persons}
+        finder={finder}
+        removeName={removeName}
       />
     </div>
   )
