@@ -1,16 +1,6 @@
 {
   "persons": [
     {
-      "name": "Artonius Hellas",
-      "number": "12345",
-      "id": 1
-    },
-    {
-      "name": "Ada Lovelace",
-      "number": "39-44-5323523",
-      "id": 2
-    },
-    {
       "name": "Dan Abramov",
       "number": "12-43-234345",
       "id": 3
@@ -36,9 +26,14 @@
       "id": 7
     },
     {
-      "name": "abc",
-      "number": "12314124124124",
+      "name": "Jarkko Setä",
+      "number": "012i934019041",
       "id": 8
+    },
+    {
+      "name": "Heikki Setä",
+      "number": "1234",
+      "id": 9
     }
   ]
 }

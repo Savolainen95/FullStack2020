@@ -1,76 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import personService from './services/persons'
+import Contents from './contents/Components'
 
-const Header = () => {
-  return <h2>Phonebook</h2>
-}
 
-const Persons = (props) => {
-  return (
-    <p>
-      {props.person.name} {props.person.number}
-      <Remove person={props.person} onClick={props.removeName} />
-    </p>
-
-  )
-}
-
-const Remove = ({ person, onClick }) => {
-  return (
-    <>
-      <button onClick={() => onClick(person)}>Poista</button>
-    </>
-  )
-}
-
-const Add = (props) => {
-  return (
-    <>
-      <div>
-        <h2>add a new number</h2>
-      </div>
-      <form>
-        <div>
-          name: <input
-            value={props.newName}
-            onChange={props.handleNameChange}
-          />
-        </div>
-        <div>
-          number: <input
-            value={props.newNumber}
-            onChange={props.handleNumberChange}
-          />
-        </div>
-        <div>
-          <button type="submit" onClick={props.addName}>Add</button>
-        </div>
-      </form>
-    </>
-  )
-}
-const Filter = (props) => {
-  return (
-    <>
-      filter shown with <input
-        value={props.finder}
-        onChange={props.handleChange}
-      />
-    </>
-  )
-}
-const Numbers = ({ persons, finder, removeName }) => {
-  return (
-    <>
-      <h2>Numbers</h2>
-      <div>
-        {persons.filter(person => person.name.toLowerCase().includes(finder.toLowerCase())).map((person, i) =>
-          <Persons key={i} person={person} removeName={removeName} />
-        )}
-      </div>
-    </>
-  )
-}
 
 
 const App = () => {
@@ -78,6 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [finder, setNewFinder] = useState('')
+  const [errorMessage, setErrorMessage] = useState([])
 
   useEffect(() => {
     personService
@@ -105,9 +38,9 @@ const App = () => {
       name: newName,
       number: newNumber
     }
-    
+
     if (persons.map(x => x.name).includes(newName)) {
-      if(window.confirm(`${newName} is alredy added to phonebook, replace older number with new one?`)) {
+      if (window.confirm(`${newName} is alredy added to phonebook, replace older number with new one?`)) {
         const nameObject = {
           name: newName,
           number: newNumber
@@ -118,6 +51,23 @@ const App = () => {
           .then(response => {
             setPersons(persons.map(personel => person.id !== personel.id ? personel : response))
           })
+          .catch(error => {
+            setErrorMessage(
+              [`Person '${newName}' was allredy removed from the server`, "error"]
+            )
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+          })
+
+        if(errorMessage === null) {
+          setErrorMessage(
+            [`Number of ${person.name} have been updated to ${newNumber}`,"succes"]
+          )
+          setTimeout(() => {
+            setErrorMessage(null)
+          }, 5000)
+        }
       }
       setNewName('')
       setNewNumber('')
@@ -129,6 +79,13 @@ const App = () => {
           setNewName('')
           setNewNumber('')
         })
+      setErrorMessage(
+        [`Added ${newName}. num ${newNumber}`,"succes"]
+      )
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+
     } else {
       window.alert(`Default input is not allowed.`)
       setNewName('')
@@ -140,27 +97,30 @@ const App = () => {
     if (window.confirm(`Do you want to remove ${person.name}`)) {
       personService.remove(person.id)
       var a = persons
+      setErrorMessage(
+        [`${person.name} is deleted from the list.`, "succes"]
+      )
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
       setPersons(a.filter(x => x.id !== person.id))
+
     }
   }
 
   return (
     <div>
-      <Header />
-      <Filter
+      <Contents
+        errorMessage={errorMessage}
         finder={finder}
         handleChange={handleChange}
-      />
-      <Add
         newName={newName}
         handleNameChange={handleNameChange}
         newNumber={newNumber}
         handleNumberChange={handleNumberChange}
         addName={addName}
-      />
-      <Numbers
         persons={persons}
-        finder={finder}
+        finder2={finder}
         removeName={removeName}
       />
     </div>
