@@ -75,13 +75,19 @@ const App = () => {
       personService
         .create(nameObject)
         .then(response => {
+          console.log(response)
           setPersons(persons.concat(response))
           setNewName('')
           setNewNumber('')
+          setErrorMessage(
+            [`Added ${newName}. num ${newNumber}`,"succes"]
+          )
+        }).catch(error => {
+          setErrorMessage (
+            [`${error.response.data.error}`, 'error']
+          )
         })
-      setErrorMessage(
-        [`Added ${newName}. num ${newNumber}`,"succes"]
-      )
+      
       setTimeout(() => {
         setErrorMessage(null)
       }, 5000)

@@ -79,7 +79,7 @@ const Header = ({ message }) => {
         </div>
       </>
     )
-  }
+  } 
 
   const Contents = ({
       errorMessage,
