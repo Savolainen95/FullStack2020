@@ -14,7 +14,7 @@ describe('Blog app', function () {
         cy.visit('http://localhost:3000')
     })
 
-   /* it('front page can be opened', function () {
+   it('front page can be opened', function () {
         cy.contains('Blogs')
         cy.contains('login')
     })
@@ -35,14 +35,14 @@ describe('Blog app', function () {
         cy.contains('login')
         cy.contains('username')
         cy.contains('password')
-    }) */
+    }) 
     describe('when logged in', function () {
         beforeEach(function () {
             cy.get('#username').type('Savukka')
             cy.get('#password').type('fäcä')
             cy.get('#login-button').click()
         })
-        /*it('contains closed blog form', function () {
+        it('contains closed blog form', function () {
             cy.contains('create new blog')
         })
         it('form opens when clicked', function () {
@@ -85,7 +85,7 @@ describe('Blog app', function () {
 
             cy.get('#view-blog').click()
             cy.get('#delete-blog').click()
-        }) */
+        })
 
         describe('Many blogs', function () {
             beforeEach(function () {
