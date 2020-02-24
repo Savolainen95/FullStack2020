@@ -1,0 +1,13 @@
+.blog {
+    color: purple;
+    font-family: 'Courier New', Courier, monospace;
+    border-style: ridge;
+    border-radius: 1px;
+    padding: 10px;
+  }
+
+  .divider{
+    width:5px;
+    height:auto;
+    display:inline-block;
+}
